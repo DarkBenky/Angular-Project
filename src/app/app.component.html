@@ -1,0 +1,131 @@
+<div *ngIf="isLoggedIn; else loginForm">
+  <div class="main">
+    <div (click)="addClick()">
+      <div class="navbar">
+        <div class="flex-row">
+          <!-- <p>Welcome</p> -->
+          <p>First name : {{ FirstName }}</p>
+          <p>Last name : {{ LastName }}</p>
+          <p>Login time : {{ LoginTime }}</p>
+          <p>Number of users {{ NumberOfUsers }}</p>
+          <p>Total Clicks {{ TotalClicks }}</p>
+          <p>Total Number of Send Characters {{ totalCharacters }}</p>
+          <p>Total Numbeer of Chats {{ totalChats }}</p>
+        </div>
+
+        <button (click)="logout()">Logout</button>
+      </div>
+      <div class="container">
+        <div class="sidebar-left">
+          <div class="user-list">
+            <div *ngFor="let user of [Users]">
+              <div
+                *ngFor="let data of user; let i = index"
+                (click)="selectUser(i)"
+              >
+                <div *ngIf="i != ID" class="user-item">
+                  <p>{{ i + 1 }}</p>
+                  <p>First Name: {{ data.firstName }}</p>
+                  <p>Last Name: {{ data.lastName }}</p>
+                  <p>Email: {{ data.email }}</p>
+                  <div *ngIf="data.clicked" class="button-group">
+                    <button (click)="getDetails(i)">Show Details</button>
+                    <button (click)="startChat(i + 1)">Start Chat</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="main-content">
+          <div *ngIf="!showDetails" class="chat-thread">
+            <div *ngFor="let key of getChatKeys(userChats)">
+              <h3>{{ key }}</h3>
+              <div *ngFor="let chat of userChats[key]" class="chat-message">
+                <p>
+                  <strong>
+                    {{
+                      chat.sender === ID ? 'You' : getUserNameByID(chat.sender)
+                    }}
+                  </strong>
+                  to
+                  <strong>
+                    {{
+                      chat.recipient === ID
+                        ? 'You'
+                        : getUserNameByID(chat.recipient)
+                    }}
+                  </strong>
+                  : {{ chat.message }} <br />
+                  <span class="chat-meta">
+                    <em>{{ chat.time | date : 'short' }}</em>
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="showDetails" class="user-details">
+            <button (click)="hideDetails()">Hide Details</button>
+            <div>
+              <p>First Name: {{ Details.firstname }}</p>
+              <p>Last Name: {{ Details.lastname }}</p>
+              <p>User Name: {{ Details.username }}</p>
+              <p>Birthdate: {{ Details.birthdate }}</p>
+              <p>University: {{ Details.university }}</p>
+              <p>Mac Address: {{ Details.macAddress }}</p>
+              <p>IP: {{ Details.ip }}</p>
+              <p>City: {{ Details.city }}</p>
+              <p>Eye Color: {{ Details.eyeColor }}</p>
+              <p>Gender: {{ Details.gender }}</p>
+              <img src="{{ Details.img }}" alt="" />
+              <div>
+                <button (click)="toggleAddressInfo()">Show Address Info</button>
+                <div *ngIf="showAddress" class="address-info">
+                  <div *ngFor="let entry of getAddressEntries()">
+                    <p>{{ entry.key }}: {{ entry.value }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-right">
+          <div *ngIf="currentChat != null" class="chat-container">
+            <button (click)="hideChat()" class="hide-chat-btn">
+              Hide Chat
+            </button>
+            <div class="message-list">
+              <div *ngFor="let msg of currentChat" class="message">
+                <p>
+                  <strong>Sender:</strong> {{ getUserNameByID(msg.sender) }}
+                </p>
+                <p>
+                  <strong>Recipient:</strong>
+                  {{ getUserNameByID(msg.recipient) }}
+                </p>
+                <p><strong>Message:</strong> {{ msg.message }}</p>
+              </div>
+            </div>
+            <div class="message-input">
+              <textarea
+                [(ngModel)]="currentMessage"
+                placeholder="Type your message here..."
+                class="message-textarea"
+              ></textarea>
+              <button (click)="sendMessage()" class="send-btn">
+                Send Message
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- </div> -->
+    </div>
+  </div>
+</div>
+<ng-template #loginForm>
+  <!-- Display login form when user is not logged in -->
+  <app-login (loginStatus)="handleLoginStatus($event)"> </app-login>
+</ng-template>
